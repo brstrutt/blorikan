@@ -1,24 +1,16 @@
-use yew::prelude::*;
-
-#[function_component]
-fn App() -> Html {
-    let counter = use_state(|| 0);
-    let onclick = {
-        let counter = counter.clone();
-        move |_| {
-            let value = *counter + 1;
-            counter.set(value);
-        }
-    };
-
-    html! {
-        <div>
-            <button {onclick}>{ "+1" }</button>
-            <p>{ *counter }</p>
-        </div>
-    }
-}
+use bevy::prelude::*;
 
 fn main() {
-    yew::Renderer::<App>::new().render();
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .add_startup_system(setup)
+        .run();
+}
+
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.spawn(Camera2dBundle::default());
+    commands.spawn(SpriteBundle {
+        texture: asset_server.load("Jetix_logo.png"),
+        ..default()
+    });
 }
