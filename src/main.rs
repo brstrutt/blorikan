@@ -19,7 +19,9 @@ fn setup_graphics(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
 }
 
-fn setup_world(mut commands: Commands) {
+fn setup_world(mut commands: Commands, mut rapier_config: ResMut<RapierConfiguration>) {
+    rapier_config.gravity = Vec2::ZERO;
+
     const SCREEN_WIDTH: f32 = 400.0;
     const SCREEN_HEIGHT: f32 = 300.0;
 
@@ -49,12 +51,14 @@ fn setup_world(mut commands: Commands) {
 }
 
 fn setup_jetix(mut commands: Commands, asset_server: Res<AssetServer>) {
-    /* Create the bouncing ball. */
     commands
     .spawn((
         RigidBody::Dynamic,
-        TransformBundle::from(Transform::from_xyz(0.0, 0.0, 0.0))
-    ))
-    .insert(Collider::ball(50.0))
-    .insert(Restitution::coefficient(1.0));
+        Collider::cuboid(170.0, 105.0),
+        Restitution::coefficient(1.0),
+        SpriteBundle {
+            texture: asset_server.load("Jetix_logo.png"),
+            ..default()
+        }
+    ));
 }
