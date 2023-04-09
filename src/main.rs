@@ -1,4 +1,6 @@
 use bevy::prelude::*;
+mod jetix;
+use jetix::JetixLogo;
 
 fn main() {
     App::new()
@@ -9,8 +11,5 @@ fn main() {
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(Camera2dBundle::default());
-    commands.spawn(SpriteBundle {
-        texture: asset_server.load("Jetix_logo.png"),
-        ..default()
-    });
+    commands.spawn(JetixLogo::new(asset_server));
 }
