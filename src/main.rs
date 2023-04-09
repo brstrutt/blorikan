@@ -5,6 +5,11 @@ mod jetix;
 use jetix::JetixLogo;
 
 fn main() {
+    // setup wasm logging, but only print warnings and above because rapier floods the logs with info
+    let logger_config = wasm_logger::Config::new(log::Level::Warn);
+    wasm_logger::init(logger_config);
+    log::warn!("App is starting");
+
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
@@ -12,6 +17,7 @@ fn main() {
         .add_startup_system(setup_graphics)
         .add_startup_system(setup_world)
         .add_startup_system(setup_jetix)
+        .add_system(user_controls)
         .run();
 }
 
@@ -53,7 +59,12 @@ fn setup_world(mut commands: Commands, mut rapier_config: ResMut<RapierConfigura
 fn setup_jetix(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
     .spawn((
+        TempName,
         RigidBody::Dynamic,
+        Velocity {
+            linvel: Vec2 { x: 100.0, y: 50.0 },
+            ..default()
+        },
         Collider::cuboid(170.0, 105.0),
         Restitution::coefficient(1.0),
         SpriteBundle {
@@ -61,4 +72,19 @@ fn setup_jetix(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         }
     ));
+}
+
+#[derive(Component)]
+struct TempName;
+
+fn user_controls(
+    keyboard_input: Res<Input<KeyCode>>,
+    mut jetix_logo: Query<(& TempName, &mut Velocity)>
+) {
+    let (_, mut velocity) = jetix_logo.single_mut();
+
+    if keyboard_input.pressed(KeyCode::Left) { velocity.linvel.x -= 1.0; }
+    if keyboard_input.pressed(KeyCode::Right) { velocity.linvel.x += 1.0; }
+    if keyboard_input.pressed(KeyCode::Up) { velocity.linvel.y += 1.0; }
+    if keyboard_input.pressed(KeyCode::Down) { velocity.linvel.y -= 1.0; }
 }
