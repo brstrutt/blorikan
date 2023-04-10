@@ -34,24 +34,28 @@ fn setup_world(mut commands: Commands, mut rapier_config: ResMut<RapierConfigura
     commands.spawn((
         Collider::cuboid(SCREEN_WIDTH, 1.0),
         TransformBundle::from(Transform::from_xyz(0.0, -1.0 * SCREEN_HEIGHT, 0.0)),
+        Friction::coefficient(0.0),
         Restitution::coefficient(1.0)
     ));
     
     commands.spawn((
         Collider::cuboid(SCREEN_WIDTH, 1.0),
         TransformBundle::from(Transform::from_xyz(0.0, SCREEN_HEIGHT, 0.0)),
+        Friction::coefficient(0.0),
         Restitution::coefficient(1.0)
     ));
     
     commands.spawn((
         Collider::cuboid(1.0, SCREEN_HEIGHT),
         TransformBundle::from(Transform::from_xyz(-1.0 * SCREEN_WIDTH, 0.0, 0.0)),
+        Friction::coefficient(0.0),
         Restitution::coefficient(1.0)
     ));
 
     commands.spawn((
         Collider::cuboid(1.0, SCREEN_HEIGHT),
         TransformBundle::from(Transform::from_xyz(SCREEN_WIDTH, 0.0, 0.0)),
+        Friction::coefficient(0.0),
         Restitution::coefficient(1.0)
     ));
 }
@@ -66,7 +70,9 @@ fn setup_jetix(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         },
         Collider::cuboid(170.0, 105.0),
+        LockedAxes::ROTATION_LOCKED,
         Restitution::coefficient(1.0),
+        Friction::coefficient(0.0),
         SpriteBundle {
             texture: asset_server.load("Jetix_logo.png"),
             ..default()
