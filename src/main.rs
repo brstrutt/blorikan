@@ -1,8 +1,13 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, window::WindowResolution};
 use bevy_rapier2d::prelude::*;
 
+mod controls;
+mod world;
 mod jetix;
-use jetix::JetixLogo;
+
+use controls::user_controls;
+use world::setup_world;
+use jetix::setup_jetix;
 
 fn main() {
     // setup wasm logging, but only print warnings and above because rapier floods the logs with info
@@ -11,9 +16,15 @@ fn main() {
     log::warn!("App is starting");
 
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                resolution: (1000., 600.).into(),
+                ..default()
+            }),
+            ..default()
+        }))
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
-        .add_plugin(RapierDebugRenderPlugin::default()) // Display the colliders
+        //.add_plugin(RapierDebugRenderPlugin::default()) // Display the colliders
         .add_startup_system(setup_graphics)
         .add_startup_system(setup_world)
         .add_startup_system(setup_jetix)
@@ -23,75 +34,4 @@ fn main() {
 
 fn setup_graphics(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
-}
-
-fn setup_world(mut commands: Commands, mut rapier_config: ResMut<RapierConfiguration>) {
-    rapier_config.gravity = Vec2::ZERO;
-
-    const SCREEN_WIDTH: f32 = 600.0;
-    const SCREEN_HEIGHT: f32 = 400.0;
-    const BORDER_THICKNESS: f32 = 100.0;
-
-    commands.spawn((
-        Collider::cuboid(SCREEN_WIDTH, BORDER_THICKNESS),
-        TransformBundle::from(Transform::from_xyz(0.0, -1.0 * SCREEN_HEIGHT, 0.0)),
-        Friction::coefficient(0.0),
-        Restitution::coefficient(1.0)
-    ));
-    
-    commands.spawn((
-        Collider::cuboid(SCREEN_WIDTH, BORDER_THICKNESS),
-        TransformBundle::from(Transform::from_xyz(0.0, SCREEN_HEIGHT, 0.0)),
-        Friction::coefficient(0.0),
-        Restitution::coefficient(1.0)
-    ));
-    
-    commands.spawn((
-        Collider::cuboid(BORDER_THICKNESS, SCREEN_HEIGHT),
-        TransformBundle::from(Transform::from_xyz(-1.0 * SCREEN_WIDTH, 0.0, 0.0)),
-        Friction::coefficient(0.0),
-        Restitution::coefficient(1.0)
-    ));
-
-    commands.spawn((
-        Collider::cuboid(BORDER_THICKNESS, SCREEN_HEIGHT),
-        TransformBundle::from(Transform::from_xyz(SCREEN_WIDTH, 0.0, 0.0)),
-        Friction::coefficient(0.0),
-        Restitution::coefficient(1.0)
-    ));
-}
-
-fn setup_jetix(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands
-    .spawn((
-        TempName,
-        RigidBody::Dynamic,
-        Velocity {
-            linvel: Vec2 { x: 100.0, y: 50.0 },
-            ..default()
-        },
-        Collider::cuboid(170.0, 105.0),
-        LockedAxes::ROTATION_LOCKED,
-        Restitution::coefficient(1.0),
-        Friction::coefficient(0.0),
-        SpriteBundle {
-            texture: asset_server.load("Jetix_logo.png"),
-            ..default()
-        }
-    ));
-}
-
-#[derive(Component)]
-struct TempName;
-
-fn user_controls(
-    keyboard_input: Res<Input<KeyCode>>,
-    mut jetix_logo: Query<(& TempName, &mut Velocity)>
-) {
-    let (_, mut velocity) = jetix_logo.single_mut();
-
-    if keyboard_input.pressed(KeyCode::Left) { velocity.linvel.x /= 1.02; }
-    if keyboard_input.pressed(KeyCode::Right) { velocity.linvel.x *= 1.02; }
-    if keyboard_input.pressed(KeyCode::Up) { velocity.linvel.y *= 1.02; }
-    if keyboard_input.pressed(KeyCode::Down) { velocity.linvel.y /= 1.02; }
 }
