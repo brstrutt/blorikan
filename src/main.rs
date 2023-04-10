@@ -28,32 +28,33 @@ fn setup_graphics(mut commands: Commands) {
 fn setup_world(mut commands: Commands, mut rapier_config: ResMut<RapierConfiguration>) {
     rapier_config.gravity = Vec2::ZERO;
 
-    const SCREEN_WIDTH: f32 = 400.0;
-    const SCREEN_HEIGHT: f32 = 300.0;
+    const SCREEN_WIDTH: f32 = 600.0;
+    const SCREEN_HEIGHT: f32 = 400.0;
+    const BORDER_THICKNESS: f32 = 100.0;
 
     commands.spawn((
-        Collider::cuboid(SCREEN_WIDTH, 1.0),
+        Collider::cuboid(SCREEN_WIDTH, BORDER_THICKNESS),
         TransformBundle::from(Transform::from_xyz(0.0, -1.0 * SCREEN_HEIGHT, 0.0)),
         Friction::coefficient(0.0),
         Restitution::coefficient(1.0)
     ));
     
     commands.spawn((
-        Collider::cuboid(SCREEN_WIDTH, 1.0),
+        Collider::cuboid(SCREEN_WIDTH, BORDER_THICKNESS),
         TransformBundle::from(Transform::from_xyz(0.0, SCREEN_HEIGHT, 0.0)),
         Friction::coefficient(0.0),
         Restitution::coefficient(1.0)
     ));
     
     commands.spawn((
-        Collider::cuboid(1.0, SCREEN_HEIGHT),
+        Collider::cuboid(BORDER_THICKNESS, SCREEN_HEIGHT),
         TransformBundle::from(Transform::from_xyz(-1.0 * SCREEN_WIDTH, 0.0, 0.0)),
         Friction::coefficient(0.0),
         Restitution::coefficient(1.0)
     ));
 
     commands.spawn((
-        Collider::cuboid(1.0, SCREEN_HEIGHT),
+        Collider::cuboid(BORDER_THICKNESS, SCREEN_HEIGHT),
         TransformBundle::from(Transform::from_xyz(SCREEN_WIDTH, 0.0, 0.0)),
         Friction::coefficient(0.0),
         Restitution::coefficient(1.0)
@@ -89,8 +90,8 @@ fn user_controls(
 ) {
     let (_, mut velocity) = jetix_logo.single_mut();
 
-    if keyboard_input.pressed(KeyCode::Left) { velocity.linvel.x -= 1.0; }
-    if keyboard_input.pressed(KeyCode::Right) { velocity.linvel.x += 1.0; }
-    if keyboard_input.pressed(KeyCode::Up) { velocity.linvel.y += 1.0; }
-    if keyboard_input.pressed(KeyCode::Down) { velocity.linvel.y -= 1.0; }
+    if keyboard_input.pressed(KeyCode::Left) { velocity.linvel.x /= 1.02; }
+    if keyboard_input.pressed(KeyCode::Right) { velocity.linvel.x *= 1.02; }
+    if keyboard_input.pressed(KeyCode::Up) { velocity.linvel.y *= 1.02; }
+    if keyboard_input.pressed(KeyCode::Down) { velocity.linvel.y /= 1.02; }
 }
